@@ -1,20 +1,20 @@
 require 'optparse'
 require_relative './nfl_terminal.rb'
+require_relative './nfl_game.rb'
 
 class NflLiveUpdates
   extend NflTerminal
 
   def initialize(game_id, update_type)
-    @game_id = game_id.to_s
+    @game = NflGame.new(game_id.to_s)
     @update_type = update_type
-    @quarter = '1'
     @clock = nil
   end
 
   def stream
-    until game_over?
+    until @game.over?
       print_updates
-      @game_json = nil
+      @game.update
       sleep(60)
     end
   end
@@ -38,45 +38,24 @@ class NflLiveUpdates
   end
 
   def play_by_play_update(time)
-    plays_for_current_drive[time]['desc']
+    @game.plays_for_current_drive[time]['desc']
   end
 
   def scoring_update(time)
-    "(#{scoring_summary[time]['type']}) #{scoring_summary[time]['desc']}"
+    "(#{@game.scoring_summary[time]['type']}) #{@game.scoring_summary[time]['desc']}"
   end
 
   def all_timestamps
-    @update_type == 'scoring' ? scoring_summary.keys : plays_for_current_drive.keys
+    if @update_type == 'scoring'
+      @game.scoring_summary.keys
+    else
+      @game.plays_for_current_drive.keys
+    end
   end
 
   def new_timestamps(timestamps)
     index = timestamps.index(@clock)
     index.nil? ? timestamps : timestamps[index..-1].drop(1)
-  end
-
-  def scoring_summary
-    game_json['scrsummary']
-  end
-
-  def plays_for_current_drive
-    game_json['drives'][current_drive]['plays']
-  end
-
-  def current_drive
-    game_json['drives']['crntdrv'].to_s
-  end
-
-  def game_json
-    @game_json ||= NflLiveUpdates.json_response(game_url)[@game_id]
-  end
-
-  def game_url
-    url = 'http://www.nfl.com/liveupdate/game-center/%d/%d_gtd.json'
-    format(url, @game_id, @game_id)
-  end
-
-  def game_over?
-    game_json['qtr'].downcase.include?('final')
   end
 
   class << self
