@@ -1,9 +1,9 @@
 require 'optparse'
-require_relative './nfl_terminal.rb'
+require_relative './nfl_schedule.rb'
 require_relative './nfl_game.rb'
 
 class NflLiveUpdates
-  extend NflTerminal
+  extend NflSchedule
 
   def initialize(game_id, update_type)
     @game = NflGame.new(game_id.to_s)

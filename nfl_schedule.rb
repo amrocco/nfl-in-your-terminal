@@ -1,7 +1,7 @@
 require 'net/http'
 require 'json'
 
-module NflTerminal
+module NflSchedule
   def game_ids(teams = 'all')
     ongoing_games(teams).map { |game| game['eid'] }
   end

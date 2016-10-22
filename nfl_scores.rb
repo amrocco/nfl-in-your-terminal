@@ -1,7 +1,7 @@
-require_relative './nfl_terminal.rb'
+require_relative './nfl_schedule.rb'
 
 module NflScores
-  extend NflTerminal
+  extend NflSchedule
 
   class << self
     def print_scores
