@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'optparse'
 require_relative './nfl_schedule.rb'
 require_relative './nfl_game.rb'
